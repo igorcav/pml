@@ -1,0 +1,64 @@
+---
+title: "Practical Machine Learning Final Project"
+author: "Igor Dutra Cavalcante"
+date: "16/08/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Practical Machine Learning - Coursera Final Project
+
+## Data
+The training data for this project are available here:
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+
+The test data are available here:
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+
+The data for this project come from this source: http://groupware.les.inf.puc-rio.br/har. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment.
+
+## Bibliotecas (Libraries)
+```{r}
+library(caret)
+library(dplyr)
+library(knitr)
+```
+
+## Leitura dos dados (Reading data)
+```{r}
+treino <- read.csv("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv", header = T, stringsAsFactors = F)
+teste  <- read.csv("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv", header = T, stringsAsFactors = F)
+dim(treino)
+dim(teste)
+head(treino)
+str(treino)
+```
+
+## Limpeza dos dados (Cleaning data)
+```{r}
+treino <- treino[,nearZeroVar(treino, saveMetrics=TRUE)$nzv == FALSE]
+teste  <- teste[,nearZeroVar(teste, saveMetrics=TRUE)$nzv == FALSE]
+treino <- treino[, (colSums(is.na(treino)) == 0)]
+teste  <- teste[, (colSums(is.na(teste)) == 0)]
+treino <- select(treino, -c(X, user_name, cvtd_timestamp))
+teste  <- select(teste, -c(X, user_name, cvtd_timestamp))
+```
+
+## Divisao (partioning)
+```{r}
+set.seed(1111) 
+emTreino   <- createDataPartition(treino$classe, p = 0.70, list = FALSE)
+validacao <- treino[-emTreino, ]
+treino    <- treino[emTreino, ]
+```
+
+## Predicao com metodo Random Forest (Prediction with Ramdom Forest method)
+```{r}
+mod_rf  <- train(classe ~ ., data = treino, method = "rf")
+pred_rf <- predict(mod_rf, validacao)
+confusionMatrix(validacao$classe, pred_rf)
+```
+
