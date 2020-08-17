@@ -39,12 +39,13 @@ str(treino)
 
 ## Limpeza dos dados (Cleaning data)
 ```{r}
-treino <- treino[,nearZeroVar(treino, saveMetrics=TRUE)$nzv == FALSE]
-teste  <- teste[,nearZeroVar(teste, saveMetrics=TRUE)$nzv == FALSE]
+treino <- treino[, -nearZeroVar(treino)]
+teste  <- teste[, -nearZeroVar(teste)]
 treino <- treino[, (colSums(is.na(treino)) == 0)]
 teste  <- teste[, (colSums(is.na(teste)) == 0)]
-treino <- select(treino, -c(X, user_name, cvtd_timestamp))
-teste  <- select(teste, -c(X, user_name, cvtd_timestamp))
+treino <- select(treino, -c(X, user_name, raw_timestamp_part_1, raw_timestamp_part_2, cvtd_timestamp, num_window))
+teste  <- select(teste, -c(X, user_name, raw_timestamp_part_1, raw_timestamp_part_2, cvtd_timestamp, num_window))
+treino$classe <- as.factor(treino$classe)
 ```
 
 ## Divisao (partioning)
@@ -55,10 +56,12 @@ validacao <- treino[-emTreino, ]
 treino    <- treino[emTreino, ]
 ```
 
-## Predicao com metodo Random Forest (Prediction with Ramdom Forest method)
+## Predicao com metodo GBM (Prediction with GBM method)
 ```{r}
-mod_rf  <- train(classe ~ ., data = treino, method = "rf")
-pred_rf <- predict(mod_rf, validacao)
-confusionMatrix(validacao$classe, pred_rf)
-```
+mod_gbm  <- train(classe ~., data = treino, method = "gbm")
+pred_gbm <- predict(mod_gbm, validacao)
+confusionMatrix(validacao$classe, pred_gbm)
 
+predict(mod_gbm, teste)
+# [1] B A B A A E D B A A B C B A E E A B B B
+```
