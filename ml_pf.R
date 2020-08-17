@@ -2,12 +2,10 @@
 library(caret)
 library(dplyr)
 library(knitr)
-library(rpart)
 
 ### Leitura dos dados (Reading data)
-setwd("/home/quarteto/Downloads")
-treino <- read.csv("pml-training.csv", header = T, stringsAsFactors = F) #https://d396qusza40orc.cloudfront.net/predmachlearn/
-teste  <- read.csv("pml-testing.csv", header = T, stringsAsFactors = F)
+treino <- read.csv("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv", header = T, stringsAsFactors = F) 
+teste  <- read.csv("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv", header = T, stringsAsFactors = F)
 dim(treino)
 dim(teste)
 head(treino)
