@@ -1,0 +1,61 @@
+<pre><code class="r setup, include=FALSE">knitr::opts_chunk$set(echo = TRUE)
+</code></pre>
+
+<h1>Practical Machine Learning - Coursera Final Project</h1>
+
+<h2>Data</h2>
+
+<p>The training data for this project are available here:
+<a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a></p>
+
+<p>The test data are available here:
+<a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a></p>
+
+<p>The data for this project come from this source: <a href="http://groupware.les.inf.puc-rio.br/har">http://groupware.les.inf.puc-rio.br/har</a>. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment.</p>
+
+<h2>Bibliotecas (Libraries)</h2>
+
+<pre><code class="r">library(caret)
+library(dplyr)
+library(knitr)
+</code></pre>
+
+<h2>Leitura dos dados (Reading data)</h2>
+
+<pre><code class="r">treino &lt;- read.csv(&quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv&quot;, header = T, stringsAsFactors = F) 
+teste  &lt;- read.csv(&quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv&quot;, header = T, stringsAsFactors = F)
+dim(treino)
+dim(teste)
+head(treino)
+str(treino)
+</code></pre>
+
+<h2>Limpeza dos dados (Cleaning data)</h2>
+
+<pre><code class="r">treino &lt;- treino[, -nearZeroVar(treino)]
+teste  &lt;- teste[, -nearZeroVar(teste)]
+treino &lt;- treino[, (colSums(is.na(treino)) == 0)]
+teste  &lt;- teste[, (colSums(is.na(teste)) == 0)]
+treino &lt;- select(treino, -c(X, user_name, raw_timestamp_part_1, raw_timestamp_part_2, cvtd_timestamp, num_window))
+teste  &lt;- select(teste, -c(X, user_name, raw_timestamp_part_1, raw_timestamp_part_2, cvtd_timestamp, num_window))
+treino$classe &lt;- as.factor(treino$classe)
+</code></pre>
+
+<h2>Divisao (partioning)</h2>
+
+<pre><code class="r">set.seed(1111) 
+emTreino   &lt;- createDataPartition(treino$classe, p = 0.70, list = FALSE)
+validacao  &lt;- treino[-emTreino, ]
+treino     &lt;- treino[emTreino, ]
+</code></pre>
+
+<h2>Predicao com metodo GBM (Prediction with GBM method)</h2>
+
+<pre><code class="r">mod_gbm  &lt;- train(classe ~., data = treino, method = &quot;gbm&quot;)
+pred_gbm &lt;- predict(mod_gbm, validacao)
+confusionMatrix(validacao$classe, pred_gbm)
+
+predict(mod_gbm, teste)
+# [1] B A B A A E D B A A B C B A E E A B B B
+</code></pre>
+
