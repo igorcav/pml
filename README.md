@@ -47,9 +47,8 @@ Once the data is clean and the features with no predictive value are discarded, 
 cor(treino[,-ncol(treino)]) %>%
   corrplot(type="upper", order="hclust", col=brewer.pal(n=8, name="RdYlBu"))
 ```
-
 ![Correlation](https://github.com/igorcav/pml/blob/master/Correlacao.jpeg)
-  
+
 The cross-validation method was then used. This method separates the training data (70%) and validation (30%), allowing for better model validation.
 ### Divisão (Partioning)
 ```{r}
