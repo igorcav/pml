@@ -66,13 +66,12 @@ pred_gbm <- predict(mod_gbm, validacao)
 confMatrix <- confusionMatrix(validacao$classe, pred_gbm)
 ```
 
-![Accuracy](https://github.com/igorcav/pml/blob/master/Acuracia.jpeg)
-
 Once the model has been trained, the validation shows an accuracy of approximately 96%. This implies an error of approximately 3.6%. That is, the model, when trying to predict classes, has this chance to make a mistake. It should be noted, as shown in the graph below, that this error is evenly distributed across classes.
 ```{r}
 confMatrix$table %>%
   plot(main = paste("Method GBM\nAccuracy:", confMatrix$overall['Accuracy']), col="orange")
 ```
+![Accuracy](https://github.com/igorcav/pml/blob/master/Acuracia.jpeg)
 
 Finally, let's test the model in the test cases:
 ```{r}
